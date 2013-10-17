@@ -7,7 +7,7 @@ admin.autodiscover()
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^mapper/', include('polls.urls')),
+    url(r'^mapper/', include('mapper.urls')),
     # url(r'^$', 'Visualiser.views.home', name='home'),
     # url(r'^Visualiser/', include('Visualiser.foo.urls')),
 
