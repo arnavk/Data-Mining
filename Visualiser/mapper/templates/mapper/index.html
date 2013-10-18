@@ -3,224 +3,87 @@
   <head>
     <meta charset="utf-8">
     <title>Heatmaps</title>
-    <style>
-      html, body, #map-canvas {
-        height: 100%;
-        margin: 0px;
-        padding: 0px
-      }
-      #panel {
-        position: absolute;
-        top: 5px;
-        left: 50%;
-        margin-left: -180px;
-        z-index: 5;
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #999;
-      }
-    </style>
+    <link rel="stylesheet" href="/static/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/static/css/style.css"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <script type="text/javascript" src="/static/js/strippers.js"></script>
+    <script type="text/javascript" src="/static/js/application.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
     <script>
       // Adding 500 Data Points
       var map, pointarray, heatmap;
-      var tweets = {{ tweets|safe }};
+      var tweets;
       var filteredTweets = new Array();
   
-      var minTime = createdAtToDate(tweets[0].created_at);
-      var maxTime = createdAtToDate(tweets[tweets.length-1].created_at);
-      var timeRange = maxTime-minTime;
+      var minTime, maxTime, timeRange;
       var currentTime;
       function initialize() {
 
         var mapOptions = {
-          zoom: 1,
+          zoom: 2,
           center: new google.maps.LatLng(0, 0),
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
 
         map = new google.maps.Map(document.getElementById('map-canvas'),
             mapOptions);
-        
-        plot(tweets);
-        // var worldBounds = new google.maps.LatLngBounds(new google.maps.LatLng(-85,-180),
-        //                                              new google.maps.LatLng(85,180));
-        // map.fitBounds(worldBounds);
-        // var allowedBounds = new google.maps.LatLngBounds(
-        //   new google.maps.LatLng(85, -180),           // top left corner of map
-        //   new google.maps.LatLng(-85, 180)            // bottom right corner
-        // );
- 
-        // map .fitBounds(allowedBounds);
+        document.getElementById("timeslider").style.visibility="hidden";
+        var slider = document.getElementById("timeslider");
+        var rangevalue = document.getElementById("rangevalue");
 
-        heatmap.setMap(map);
+        slider.addEventListener("input", function() {
+            currentTime = new Date (minTime.getTime() + (slider.value*timeRange*0.01));
+            rangevalue.value = currentTime;
+        }, false); 
       }
-
-      function plot(tweets)
-      {
-        var points = new Array();
-        console.log(tweets.length);
-        for (var i = 0; i <tweets.length; i++)
-        {
-          points.push(stripToLatLong(stripToLatLongTime(tweets[i])));
-        }
-        var pointArray = new google.maps.MVCArray(points);  
-        if(heatmap) heatmap.setMap(null);
-
-        heatmap = new google.maps.visualization.HeatmapLayer({
-          data: pointArray
-        });
-        heatmap.setMap(map);
-      }
-
-      function toggleHeatmap() {
-        heatmap.setMap(heatmap.getMap() ? null : map);
-      }
-
-      function changeGradient() {
-        var gradient = [
-          'rgba(0, 255, 255, 0)',
-          'rgba(0, 255, 255, 1)',
-          'rgba(0, 191, 255, 1)',
-          'rgba(0, 127, 255, 1)',
-          'rgba(0, 63, 255, 1)',
-          'rgba(0, 0, 255, 1)',
-          'rgba(0, 0, 223, 1)',
-          'rgba(0, 0, 191, 1)',
-          'rgba(0, 0, 159, 1)',
-          'rgba(0, 0, 127, 1)',
-          'rgba(63, 0, 91, 1)',
-          'rgba(127, 0, 63, 1)',
-          'rgba(191, 0, 31, 1)',
-          'rgba(255, 0, 0, 1)'
-        ]
-        heatmap.setOptions({
-          gradient: heatmap.get('gradient') ? null : gradient
-        });
-      }
-
-      function changeRadius() {
-        heatmap.setOptions({radius: heatmap.get('radius') ? null : 20});
-      }
-
-      function changeOpacity() {
-        heatmap.setOptions({opacity: heatmap.get('opacity') ? null : 0.2});
-      }
-
-      function updateMap(percentage) {
-        currentTime = new Date (minTime.getTime() + (percentage*timeRange*0.01));
-        filteredTweets = new Array();
-        for(var i = 0; i < tweets.length; i++){
-          tweetTime = new Date(createdAtToDate(tweets[i].created_at));
-          
-          if(tweetTime.getTime() <= currentTime.getTime()){
-            filteredTweets.push(tweets[i]);
-          }
-          else
-            break;
-        }
-        plot(filteredTweets);
-        document.getElementById("showCount").innerHTML = filteredTweets.length;
-      }
-
       google.maps.event.addDomListener(window, 'load', initialize);
-      $(function(){
-  
-        var currVal = $('#currentValue');
-        
-        $("#slider").slider({ 
-          max: maxTime.getTime(),
-          min: minTime.getTime(),
-          slide: function(event, ui) {
-            currentTime = new Date(ui.value);
-            currVal.html(currentTime.toLocaleString());
-            filterByTime();
-          }
-        });
-        
-      });
-        
-      function filterByTime(){
-        filteredTweets = new Array();
-        document.getElementById("showCount").innerHTML = 0;
-        for(var i = 0; i < tweets.length; i++){
-          tweetTime = new Date(tweets[i].created_at);
-          
-          if(tweetTime.getTime() <= currentTime.getTime()){
-            filteredTweets.push(tweets[i]);
-          }
-          else
-            break;
-        }
-        plot(filteredTweets);
-        document.getElementById("showCount").innerHTML = filteredTweets.length;
-      }
-
-    </script>
-    <script type="text/javascript">
-    // $(document).ready(function() {
-    //     $('#searchForm').submit(function(event){
-    //         event.preventDefault(); // cancel the default action
-    //         var form = this;
-    //         var data = {}
-    //         data.post_data = $(form).find("input[name=hashtag]").val();
-    //         console.log(data.post_data);
-    //         $.post("mapper/test/", 
-    //             data, 
-    //             function(responseData) {
-    //               alert(responseData.response_text);
-    //               alert("hello");
-    //             },
-    //             "json"
-    //         );
-    //     });
-    // });
-    </script>
-    <script type="text/javascript">
-      function search()
-      {
-        var hashtag=document.forms["searchForm"]["hashtag"].value;
-        console.log(hashtag);
-        $.ajax({
-            type:"GET",
-            url :"/search/hello",
-            datatype:"json",
-            error:function(data){alert('Error:');},
-            success:function(data){
-              tweets = JSON.parse(data);
-              console.log(tweets);
-              console.log(tweets.length);
-              plot(tweets);
-            },
-          });
-
-        return false;
-      }
+      
     </script>
   </head>
 
   <body>
-    <div id="panel">
-      <form id="searchForm" name="searchForm" method="post" onsubmit="return search();">
-        {% csrf_token %}
-        <input type="text" name="hashtag" id = "hashtag">
-        <input type="submit" value="Search!">
-      </form>
-      <br>
-      <input type="range" min="0" max="100" onchange="updateMap(this.value)">
-      <div id="slider"></div>
-      <p class="note">Till: <span id="currentValue"></span></p>
-      <label id="showCount">0 </label>
-      
-      <!-- <button onclick="toggleHeatmap()">Toggle Heatmap</button>
-      <button onclick="changeGradient()">Change gradient</button>
-      <button onclick="changeRadius()">Change radius</button>
-      <button onclick="changeOpacity()">Change opacity</button> -->
-    </div>
     <div id="map-canvas"></div>
+    <div class="panel">
+      <div class="container">
+        <form id="searchForm" name="searchForm" method="post" onsubmit="return search();" role="form">
+          {% csrf_token %}
+          <br>
+          <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+              <div class="input-group input-group-lg">
+                <span class="input-group-addon glyphicon glyphicon-search"></span>
+                <input type="text" class="form-control input-lg" name="hashtag" id = "hashtag">
+                <span class="input-group-btn">
+                  <button id = "searchButton" class="btn btn-success btn-lg has-spinner" data-loading-text="Loading..." type="submit">
+                    <span class="searchButtonText">Search!</span>
+                  </button>
+                </span>
+              </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+          </div><!-- /.row -->
+        </form>
+        <br>
+        <br>
+        <br>
+        <div class="row" id="sliderRow">
+          <div class="col-md-2">
+          </div>
+          <div class="col-md-8">
+            <!-- <form> -->
+              <input class="col-md-12" id = "timeslider" name = "timeslider"  type="range" min="0" max="100" onchange="updateMap(this.value);">
+              <output for="timeslider" id="rangevalue"></output>
+            <!-- </form> -->
+          </div><!-- /.col-lg-6 -->
+        </div><!-- /.row -->
+        <br>
+        
+        
+      </div> <!-- /container -->
+    </div> <!-- /panel -->
+    
   </body>
 </html>

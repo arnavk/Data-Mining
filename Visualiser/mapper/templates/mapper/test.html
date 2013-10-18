@@ -1,0 +1,17 @@
+    <div id="panel">
+      <form id="searchForm" name="searchForm" method="post" onsubmit="return search();">
+        {% csrf_token %}
+        <input class="input-lg col-lg-8" type="text" name="hashtag" id = "hashtag">
+        <input type="submit" value="Search!">
+      </form>
+      <br>
+      <input id = "timeslider" type="range" min="0" max="100" onchange="updateMap(this.value)">
+      <div id="slider"></div>
+      <p class="note">Till: <span id="currentValue"></span></p>
+      <label id="showCount">0 </label>
+      
+      <!-- <button onclick="toggleHeatmap()">Toggle Heatmap</button>
+      <button onclick="changeGradient()">Change gradient</button>
+      <button onclick="changeRadius()">Change radius</button>
+      <button onclick="changeOpacity()">Change opacity</button> -->
+    </div>

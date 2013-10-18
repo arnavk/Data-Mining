@@ -27,11 +27,14 @@ def search(request):
 def tagsearch(request, hashtag):
 	print hashtag
 	# data = open(os.path.join(settings.STATIC_ROOT, 'smaller_clean.json'), 'rb').read()
-	data = open(os.path.join(settings.STATIC_ROOT, 'smaller_clean.json'))
+	data = open(os.path.join(settings.STATIC_ROOT, 'clean.json'))
 	tweets = json.load(data)
-	print tweets[2]["lang"]
-	print str(json.dumps(tweets))
-	return HttpResponse(json.dumps(tweets, ensure_ascii=False))
+	filteredTweets = []
+	for tweet in tweets:
+		for usedHashtag in tweet["hashtags"]:
+			if hashtag.lower() == usedHashtag.lower():
+				filteredTweets.append(tweet)
+	return HttpResponse(json.dumps(filteredTweets, ensure_ascii=False))
 
 def test(request):
 	if request.is_ajax(): 
