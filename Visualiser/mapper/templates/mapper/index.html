@@ -187,15 +187,15 @@
         console.log(hashtag);
         $.ajax({
             type:"GET",
-            url :"/mapper/hello/",
+            url :"/search/hello",
             datatype:"json",
             error:function(data){alert('Error:');},
             success:function(data){
-              
               tweets = JSON.parse(data);
               console.log(tweets);
+              console.log(tweets.length);
               plot(tweets);
-            }
+            },
           });
 
         return false;

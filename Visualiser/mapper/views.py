@@ -3,16 +3,14 @@ from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.conf import settings
 from mapper.models import *
-import os
-import logging
-logger = logging.getLogger(__name__)
+import os, json
+
 def index(request):
 	template = loader.get_template('mapper/index.html')
 	tweets = open(os.path.join(settings.STATIC_ROOT, 'clean.json'), 'rb').read()
 	context = RequestContext(request, {
 		'tweets': tweets,
 	})
-	logger.debug("YO!")
 	return HttpResponse(template.render(context))
 
 def search(request):
@@ -27,10 +25,13 @@ def search(request):
 	return index
 
 def tagsearch(request, hashtag):
-	template = loader.get_template('mapper/index.html')
 	print hashtag
-	tweets = open(os.path.join(settings.STATIC_ROOT, 'smaller_clean.json'), 'rb').read()
-	return HttpResponse(tweets)
+	# data = open(os.path.join(settings.STATIC_ROOT, 'smaller_clean.json'), 'rb').read()
+	data = open(os.path.join(settings.STATIC_ROOT, 'smaller_clean.json'))
+	tweets = json.load(data)
+	print tweets[2]["lang"]
+	print str(json.dumps(tweets))
+	return HttpResponse(json.dumps(tweets, ensure_ascii=False))
 
 def test(request):
 	if request.is_ajax(): 
