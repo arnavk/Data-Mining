@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
+from mapper import views
 admin.autodiscover()
 
 # Uncomment the next two lines to enable the admin:
@@ -8,7 +9,7 @@ admin.autodiscover()
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^mapper/', include('mapper.urls')),
+    url(r'^', include('mapper.urls')),
     # url(r'^$', 'Visualiser.views.home', name='home'),
     # url(r'^Visualiser/', include('Visualiser.foo.urls')),
 

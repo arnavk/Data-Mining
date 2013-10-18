@@ -1,12 +1,12 @@
 function stripToLatLongTime (tweet)
 {
 	//console.log (tweet);
-	var striped = {
+	var stripped = {
 		lat : tweet.coord[0],
 		lon : tweet.coord[1],
 		time : createdAtToDate (tweet.created_at),
 	};
-	return striped;
+	return stripped;
 }
 
 function createdAtToDate (created_at)

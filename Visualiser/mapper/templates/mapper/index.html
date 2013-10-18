@@ -20,12 +20,21 @@
         border: 1px solid #999;
       }
     </style>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script type="text/javascript" src="/static/js/strippers.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
     <script>
       // Adding 500 Data Points
       var map, pointarray, heatmap;
       var tweets = {{ tweets|safe }};
+      var filteredTweets = new Array();
+  
+      var minTime = createdAtToDate(tweets[0].created_at);
+      var maxTime = createdAtToDate(tweets[tweets.length-1].created_at);
+      var timeRange = maxTime-minTime;
+      var currentTime;
       function initialize() {
 
         var mapOptions = {
@@ -38,9 +47,16 @@
             mapOptions);
         
         plot(tweets);
-        var worldBounds = new google.maps.LatLngBounds(new google.maps.LatLng(-85,-180),
-                                                     new google.maps.LatLng(85,180));
-        map.fitBounds(worldBounds);
+        // var worldBounds = new google.maps.LatLngBounds(new google.maps.LatLng(-85,-180),
+        //                                              new google.maps.LatLng(85,180));
+        // map.fitBounds(worldBounds);
+        // var allowedBounds = new google.maps.LatLngBounds(
+        //   new google.maps.LatLng(85, -180),           // top left corner of map
+        //   new google.maps.LatLng(-85, 180)            // bottom right corner
+        // );
+ 
+        // map .fitBounds(allowedBounds);
+
         heatmap.setMap(map);
       }
 
@@ -58,7 +74,7 @@
         heatmap = new google.maps.visualization.HeatmapLayer({
           data: pointArray
         });
-
+        heatmap.setMap(map);
       }
 
       function toggleHeatmap() {
@@ -95,22 +111,111 @@
         heatmap.setOptions({opacity: heatmap.get('opacity') ? null : 0.2});
       }
 
-      google.maps.event.addDomListener(window, 'load', initialize);
+      function updateMap(percentage) {
+        currentTime = new Date (minTime.getTime() + (percentage*timeRange*0.01));
+        filteredTweets = new Array();
+        for(var i = 0; i < tweets.length; i++){
+          tweetTime = new Date(createdAtToDate(tweets[i].created_at));
+          
+          if(tweetTime.getTime() <= currentTime.getTime()){
+            filteredTweets.push(tweets[i]);
+          }
+          else
+            break;
+        }
+        plot(filteredTweets);
+        document.getElementById("showCount").innerHTML = filteredTweets.length;
+      }
 
+      google.maps.event.addDomListener(window, 'load', initialize);
+      $(function(){
+  
+        var currVal = $('#currentValue');
+        
+        $("#slider").slider({ 
+          max: maxTime.getTime(),
+          min: minTime.getTime(),
+          slide: function(event, ui) {
+            currentTime = new Date(ui.value);
+            currVal.html(currentTime.toLocaleString());
+            filterByTime();
+          }
+        });
+        
+      });
+        
+      function filterByTime(){
+        filteredTweets = new Array();
+        document.getElementById("showCount").innerHTML = 0;
+        for(var i = 0; i < tweets.length; i++){
+          tweetTime = new Date(tweets[i].created_at);
+          
+          if(tweetTime.getTime() <= currentTime.getTime()){
+            filteredTweets.push(tweets[i]);
+          }
+          else
+            break;
+        }
+        plot(filteredTweets);
+        document.getElementById("showCount").innerHTML = filteredTweets.length;
+      }
+
+    </script>
+    <script type="text/javascript">
+    // $(document).ready(function() {
+    //     $('#searchForm').submit(function(event){
+    //         event.preventDefault(); // cancel the default action
+    //         var form = this;
+    //         var data = {}
+    //         data.post_data = $(form).find("input[name=hashtag]").val();
+    //         console.log(data.post_data);
+    //         $.post("mapper/test/", 
+    //             data, 
+    //             function(responseData) {
+    //               alert(responseData.response_text);
+    //               alert("hello");
+    //             },
+    //             "json"
+    //         );
+    //     });
+    // });
+    </script>
+    <script type="text/javascript">
+      function search()
+      {
+        var hashtag=document.forms["searchForm"]["hashtag"].value;
+        console.log(hashtag);
+        $.ajax({
+            type:"GET",
+            url :"/mapper/hello/",
+            datatype:"json",
+            error:function(data){alert('Error:');},
+            success:function(data){
+              
+              tweets = JSON.parse(data);
+              console.log(tweets);
+              plot(tweets);
+            }
+          });
+
+        return false;
+      }
     </script>
   </head>
 
   <body>
     <div id="panel">
-      <form name="input" action="" method="get">
-        <input type="text" name="search">
+      <form id="searchForm" name="searchForm" method="post" onsubmit="return search();">
+        {% csrf_token %}
+        <input type="text" name="hashtag" id = "hashtag">
         <input type="submit" value="Search!">
       </form>
-      <form action="" method="get">
-        <input type="range" name="points" min="0" max="100">
-        <input type="submit" value="Search!">
-      </form>
-
+      <br>
+      <input type="range" min="0" max="100" onchange="updateMap(this.value)">
+      <div id="slider"></div>
+      <p class="note">Till: <span id="currentValue"></span></p>
+      <label id="showCount">0 </label>
+      
       <!-- <button onclick="toggleHeatmap()">Toggle Heatmap</button>
       <button onclick="changeGradient()">Change gradient</button>
       <button onclick="changeRadius()">Change radius</button>
