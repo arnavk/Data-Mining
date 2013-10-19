@@ -1,2 +1,10 @@
 
-Visualiser/data/clean.json
+*.pyc
+
+*.json
+
+Visualiser/db
+
+Visualiser/data/*.json
+
+Visualiser/static/*.json
