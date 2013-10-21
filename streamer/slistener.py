@@ -35,8 +35,55 @@ class SListener(StreamListener):
             print warning['message']
             return false
 
+    def clean (self, tweet):
+        created_at = tweet['created_at']
+        id_str = tweet['id_str']
+        text = tweet['text']
+        user_id = tweet['user']['id_str']
+        user_handle = tweet['user']['screen_name']
+        hashtags_raw = tweet['entities']['hashtags']
+        hashtags = list()
+        for x in range(0, len(hashtags_raw)):
+            hashtags.append(hashtags_raw[x]['text'])
+        if tweet['geo'] != None:
+            coord = tweet['coordinates']['coordinates']
+            coord.reverse()
+        else:
+            coord_raw = tweet['place']['bounding_box']['coordinates']
+            x1y1 = coord_raw[0][0]
+            x3y3 = coord_raw[0][2]
+            xx = (x3y3[0] + x1y1[0])/2
+            yy = (x3y3[1] + x1y1[1])/2
+            coord = [yy,xx]
+        if tweet['place'] != None:
+            country = tweet['place']['country']
+            country_code = tweet['place']['country_code']
+        else:
+            country = "Unknown"
+            country_code = "UNKN"
+        lang = tweet['lang']
+        clean_tweet = {}
+        clean_tweet['created_at'] = created_at
+        clean_tweet['id_str'] = id_str
+        clean_tweet['text'] = text
+        clean_tweet['user_id'] = user_id
+        clean_tweet['user_handle'] = user_handle
+        clean_tweet['hashtags'] = hashtags
+        clean_tweet['coord'] = coord
+        clean_tweet['country_code'] = country_code
+        clean_tweet['country'] = country
+        clean_tweet['lang'] = lang
+
+        return json.dumps(clean_tweet)
+        
     def on_status(self, status):
-        self.output.write(status + "\n")
+
+        tweet = json.loads(status)
+        if len(tweet['entities']['hashtags']) == 0:
+            return
+
+        clean_tweet = self.clean(tweet)    
+        self.output.write(clean_tweet + "\n")
 
         self.counter += 1
 

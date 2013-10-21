@@ -30,7 +30,7 @@ class Tweet (models.Model):
 		tweet['created_at'] = self.created_at
 		tweet['id_str'] = self.id_str
 		tweet['text'] = self.text
-		# tweet['user'] = self.user
+		# tweet['user'] = self.user - TODO - ADD USERNAME ALSO!!
 		tweet['hashtags'] = json.loads(self.hashtags)
 		tweet['coord'] = json.loads(self.coord)
 		tweet['country_code'] = self.country_code
