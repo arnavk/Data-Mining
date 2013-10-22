@@ -5,18 +5,27 @@ class SListener(StreamListener):
 
     def __init__(self, api = None, fprefix = 'streamer'):
         self.api = api or API()
-        self.counter = 0
+        self.counter_nlp = 0
+        self.counter_dm = 0
         self.fprefix = fprefix
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        dest_dir = os.path.join(script_dir, 'streaming_data_lang')
+        dest_dir_nlp = os.path.join(script_dir, 'streaming_data_nlp')
         try:
-            os.makedirs(dest_dir)
+            os.makedirs(dest_dir_nlp)
         except OSError:
             pass # already exists
-        path = os.path.join(dest_dir, fprefix + '.' 
+        path_nlp = os.path.join(dest_dir_nlp, fprefix + '.' 
                             + time.strftime('%Y%m%d-%H%M%S') + '.json')
-
-        self.output  = open(path, 'w')
+        
+        dest_dir_dm = os.path.join(script_dir, 'streaming_data_dm')
+        try:
+            os.makedirs(dest_dir_dm)
+        except OSError:
+            pass # already exists
+        path_dm = os.path.join(dest_dir_dm, fprefix + '.' 
+                            + time.strftime('%Y%m%d-%H%M%S') + '.json')
+        self.output_nlp  = open(path_nlp, 'w')
+        self.output_dm  = open(path_dm, 'w')
         self.delout  = open('delete.txt', 'a')
 
     def on_data(self, data):
@@ -79,28 +88,52 @@ class SListener(StreamListener):
     def on_status(self, status):
 
         tweet = json.loads(status)
-        if tweet['lang'] != 'en':
-            return
+        if len(tweet['entities']['hashtags']) != 0:
+            clean_tweet = self.clean(tweet)
+            self.write_dm(clean_tweet)
 
-        clean_tweet = self.clean(tweet)    
-        self.output.write(clean_tweet + "\n")
+        if tweet['lang'] == 'en':
+            clean_tweet = self.clean(tweet)
+            self.write_nlp(clean_tweet)
 
-        self.counter += 1
+        return
 
-        if self.counter >= 10000:
-            self.output.close()
+    def write_dm (self, clean_tweet):
+        self.output_dm.write(clean_tweet + "\n")
+
+        self.counter_dm += 1
+
+        if self.counter_dm >= 10000:
+            self.output_dm.close()
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            dest_dir = os.path.join(script_dir, 'streaming_data_lang')
+            dest_dir = os.path.join(script_dir, 'streaming_data_dm')
             try:
                 os.makedirs(dest_dir)
             except OSError:
                 pass # already exists
             path = os.path.join(dest_dir, self.fprefix + '.' 
                                + time.strftime('%Y%m%d-%H%M%S') + '.json')
-            self.output = open(path, 'w')
-            self.counter = 0
+            self.output_dm = open(path, 'w')
+            self.counter_dm = 0
+        
+    def write_nlp (self, clean_tweet):
+        self.output_nlp.write(clean_tweet + "\n")
 
-        return
+        self.counter_nlp += 1
+
+        if self.counter_nlp >= 10000:
+            self.output_nlp.close()
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            dest_dir = os.path.join(script_dir, 'streaming_data_nlp')
+            try:
+                os.makedirs(dest_dir)
+            except OSError:
+                pass # already exists
+            path = os.path.join(dest_dir, self.fprefix + '.' 
+                               + time.strftime('%Y%m%d-%H%M%S') + '.json')
+            self.output_nlp = open(path, 'w')
+            self.counter_nlp = 0
+
 
     def on_delete(self, status_id, user_id):
         self.delout.write( str(status_id) + "\n")
