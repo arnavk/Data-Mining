@@ -88,3 +88,8 @@ input[type="range"]:hover ~ #rangevalue,input[type="range"]:active ~ #rangevalue
     transition: all 0.5s ease;
     top: -65px;
 }
+
+.layout { padding: 50px; font-family: Georgia, serif; }
+.layout-slider { margin-bottom: 60px; width: 100%; }
+.layout-slider-settings { font-size: 12px; padding-bottom: 10px; }
+.layout-slider-settings pre { font-family: Courier; }

@@ -7,18 +7,45 @@
     <link rel="stylesheet" href="/static/css/font-awesome.css"/>
     <link rel="stylesheet" href="/static/css/style.css"/>
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script type="text/javascript" src="/static/js/application.js"></script>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <script type="text/javascript" src="/static/js/application.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
+    <script type="text/javascript" src="/static/js/maplabel-compiled.js"></script>
+    <script type="text/javascript" src="/static/js/jshashtable-2.1_src.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.numberformatter-1.2.3.js"></script>
+    <script type="text/javascript" src="/static/js/tmpl.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.dependClass-0.1.js"></script>
+    <script type="text/javascript" src="/static/js/draggable-0.1.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.slider.js"></script>
+    <link rel="stylesheet" href="/static/css/jslider.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/jslider.blue.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/jslider.plastic.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/jslider.round.css" type="text/css">
+    <link rel="stylesheet" href="/static/css/jslider.round.plastic.css" type="text/css">
     <script>
-      // Adding 500 Data Points
       var map, pointarray, heatmap;
       var tweets;
       var filteredTweets = new Array();
-  
+      var clusters;
+      var clusterLabels;
       var minTime, maxTime, timeRange;
+      var absoluteMinTime = createdAtToDate("{{ startTime|safe }}");
+      var absoluteMaxTime = createdAtToDate("{{ endTime|safe }}");
+      var absoluteRange = absoluteMaxTime - absoluteMinTime;
       var currentTime;
+      function createdAtToDate (created_at)
+      {
+        var date = new Date(
+            created_at.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
+              "$1 $2 $4 $3 UTC"));
+        return date;
+      }
+
+      function timeForPercentage (percentage)
+      {
+        return new Date (absoluteMinTime.getTime() + (percentage * absoluteRange * 0.01));
+      }
       function initialize() {
 
         var mapOptions = {
@@ -37,10 +64,13 @@
             currentTime = new Date (minTime.getTime() + (slider.value*timeRange*0.01));
             rangevalue.value = currentTime;
         }, false); 
+
+        getAllClusters();
+
       }
       google.maps.event.addDomListener(window, 'load', initialize);
-      
     </script>
+    
   </head>
 
   <body>
@@ -76,6 +106,20 @@
             <!-- <form> -->
               <input class="col-md-12" id = "timeslider" name = "timeslider"  type="range" min="0" max="100" onchange="updateMap(this.value);">
               <output for="timeslider" id="rangevalue"></output>
+              <!-- <div id="slider-range"></div> -->
+              <div class="layout-slider col-md-12">
+                <input id="Slider5" type="slider" name="area" class="" value="0;100" />
+              </div>
+              <script type="text/javascript" charset="utf-8">
+                    jQuery("#Slider5").slider({ from: 0, to: 100, step: 15, dimension: '', limits: false, skin: "round_plastic", calculate: function( value ){
+                        return timeForPercentage (value);
+                      }, callback: function(value){
+                        console.log(value);
+                        var array = value.split(';');
+                        plotTrends(array[0], array[1]);
+                    }});
+                
+              </script>
             <!-- </form> -->
           </div><!-- /.col-lg-6 -->
         </div><!-- /.row -->
