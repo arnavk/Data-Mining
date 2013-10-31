@@ -77,11 +77,49 @@
 
   <body>
     <div id="map-canvas"></div>
-    <div class="panel">
-      <div class="container">
-        <div class="row">
+    <div id = "wrap" class ="wrapper">
+      <div class="panel">
+        <div class="container">
+          <form id="searchForm" name="searchForm" method="post" onsubmit="return search();" role="form">
+            {% csrf_token %}
+            <br>
+            <div class="row">
+              <div class="col-md-2">
+              </div>
+              <div class="col-md-8">
+                <div class="input-group input-group-lg">
+                  <span class="input-group-addon glyphicon glyphicon-search"></span>
+                  <input type="text" class="form-control input-lg" name="hashtag" id = "hashtag">
+                  <span class="input-group-btn">
+                    <button id = "searchButton" class="btn btn-success btn-lg has-spinner" data-loading-text="Loading..." type="submit">
+                      <span class="searchButtonText">Search!</span>
+                    </button>
+                  </span>
+                </div><!-- /input-group -->
+              </div><!-- /.col-lg-8 -->
+            </div><!-- /.row -->
+          </form>
           <br>
-        </div>
+          <br>
+          <br>
+          <div class="row" id="sliderRow">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                <input class="col-md-12" id = "timeslider" name = "timeslider"  type="range" min="0" max="100" onchange="updateMap(this.value);">
+                <output for="timeslider" id="rangevalue"></output>
+                <!-- <div id="slider-range"></div> -->
+                
+            </div><!-- /.col-lg-8 -->
+          </div><!-- /.row -->
+          <br>  
+        </div> <!-- /container -->
+      </div> <!-- /panel -->
+      <div class ="push">
+      </div>
+    </div><!-- wrap  -->
+    <div id="footer" class ="footer">
+      <div class = "container">
         <div class="row">  
           <div class="col-md-2">
           </div>
@@ -100,43 +138,7 @@
               </script>              
           </div><!-- /.col-lg-8 -->
         </div><!-- /.row -->
-        <form id="searchForm" name="searchForm" method="post" onsubmit="return search();" role="form">
-          {% csrf_token %}
-          <br>
-          <div class="row">
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-8">
-              <div class="input-group input-group-lg">
-                <span class="input-group-addon glyphicon glyphicon-search"></span>
-                <input type="text" class="form-control input-lg" name="hashtag" id = "hashtag">
-                <span class="input-group-btn">
-                  <button id = "searchButton" class="btn btn-success btn-lg has-spinner" data-loading-text="Loading..." type="submit">
-                    <span class="searchButtonText">Search!</span>
-                  </button>
-                </span>
-              </div><!-- /input-group -->
-            </div><!-- /.col-lg-8 -->
-          </div><!-- /.row -->
-        </form>
-        <br>
-        <br>
-        <br>
-        <div class="row" id="sliderRow">
-          <div class="col-md-2">
-          </div>
-          <div class="col-md-8">
-              <input class="col-md-12" id = "timeslider" name = "timeslider"  type="range" min="0" max="100" onchange="updateMap(this.value);">
-              <output for="timeslider" id="rangevalue"></output>
-              <!-- <div id="slider-range"></div> -->
-              
-          </div><!-- /.col-lg-8 -->
-        </div><!-- /.row -->
-        <br>
-        
-        
-      </div> <!-- /container -->
-    </div> <!-- /panel -->
-    
+      </div>
+    </div>
   </body>
 </html>
