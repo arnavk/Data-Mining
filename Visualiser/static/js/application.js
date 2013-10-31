@@ -174,39 +174,59 @@ function plotTrends(startPercentage, endPercentage)
   console.log("Plotting trends yo!");
   var startTime = new Date (absoluteMinTime.getTime() + (startPercentage*absoluteRange*0.01));
   var endTime = new Date (absoluteMinTime.getTime() + (endPercentage*absoluteRange*0.01));
-  console.log(startTime.toString());
-  console.log(endTime.toString());
+  console.log(convertDateToUTC(startTime).toString());
+  console.log(convertDateToUTC(endTime).toString());
+
+  console.log("Came here");
+  queryURL = "/clusters/" + convertDateToUTC(startTime).toString() + "|" + convertDateToUTC(endTime).toString() + "/";
+  $.ajax({
+    type:"GET",
+    url :queryURL,
+    datatype:"json",
+    error:function(data){alert('Error:');},
+    success:function(data){
+      console.log("Got data!");
+      var new_clusters = JSON.parse(data);
+      console.log(new_clusters);
+      updateClusters(new_clusters);
+    },
+  });
 }
 
 
 function getAllClusters()
 {
   console.log("Came here");
-  queryURL = "/clusters/";
+  queryURL = "/clusters/all/";
   $.ajax({
-      type:"GET",
-      url :queryURL,
-      datatype:"json",
-      error:function(data){alert('Error:');},
-      success:function(data){
-        console.log("Got data!");
-        var new_clusters = JSON.parse(data);
-        console.log(new_clusters);
-        updateClusters(new_clusters);
-      },
-    });
+    type:"GET",
+    url :queryURL,
+    datatype:"json",
+    error:function(data){alert('Error:');},
+    success:function(data){
+      console.log("Got data!");
+      var new_clusters = JSON.parse(data);
+      console.log(new_clusters);
+      updateClusters(new_clusters);
+    },
+  });
 
   return false;
 }
-function updateClusters(new_clusters)
+function removeCurrentClusters ()
 {
   if (clusterLabels)
   {
     for (var i = 0; i < clusterLabels.length; i++)
     {
-      clusterLabels[i].map = null;
+      clusterLabels[i].setMap(null);
     }
   }
+  clusterLabels = new Array();
+}
+function updateClusters(new_clusters)
+{
+  removeCurrentClusters();
   clusters = new_clusters;
   clusterLabels = new Array();
   for (var i = 0; i < clusters.length; i++)
@@ -214,12 +234,12 @@ function updateClusters(new_clusters)
     var cluster = clusters[i];
     console.log(cluster);
     clusterLabels.push(new MapLabel({
-          text: cluster['hashtag'],
-          fontFamily : '"Trebuchet MS", Helvetica, sans-serif',
-          position: new google.maps.LatLng(cluster['coord'][0], cluster["coord"][1]),
-          map: map,
-          fontSize: 35,
-          align: 'right'
-        }));
+      text: cluster['hashtag'],
+      fontFamily : '"Trebuchet MS", Helvetica, sans-serif',
+      position: new google.maps.LatLng(cluster['coord'][0], cluster["coord"][1]),
+      map: map,
+      fontSize: 35,
+      align: 'right'
+    }));
   }
 }

@@ -174,11 +174,11 @@ function plotTrends(startPercentage, endPercentage)
   console.log("Plotting trends yo!");
   var startTime = new Date (absoluteMinTime.getTime() + (startPercentage*absoluteRange*0.01));
   var endTime = new Date (absoluteMinTime.getTime() + (endPercentage*absoluteRange*0.01));
-  console.log(startTime.toString());
-  console.log(endTime.toString());
+  console.log(convertDateToUTC(startTime).toString());
+  console.log(convertDateToUTC(endTime).toString());
 
   console.log("Came here");
-  queryURL = "/clusters/" + startTime.toString() + "|" + endTime.toString() + "/";
+  queryURL = "/clusters/" + convertDateToUTC(startTime).toString() + "|" + convertDateToUTC(endTime).toString() + "/";
   $.ajax({
     type:"GET",
     url :queryURL,
@@ -213,15 +213,20 @@ function getAllClusters()
 
   return false;
 }
-function updateClusters(new_clusters)
+function removeCurrentClusters ()
 {
   if (clusterLabels)
   {
     for (var i = 0; i < clusterLabels.length; i++)
     {
-      clusterLabels[i].map = null;
+      clusterLabels[i].setMap(null);
     }
   }
+  clusterLabels = new Array();
+}
+function updateClusters(new_clusters)
+{
+  removeCurrentClusters();
   clusters = new_clusters;
   clusterLabels = new Array();
   for (var i = 0; i < clusters.length; i++)

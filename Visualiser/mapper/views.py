@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import RequestContext, loader
 from django.conf import settings
 from mapper.models import *
-import os, json
+import os, json, operator
 
 def index(request):
 	template = loader.get_template('mapper/index.html')
@@ -60,22 +60,66 @@ def initialize(request):
 	return index
 
 def clusters (request, range):
-	# if range == "all":
-	clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered.json'), 'rb').read()
-	print clusters
-	clusterJSON = json.loads(clusters)
-	print clusterJSON[1]
-	return HttpResponse(json.dumps(clusterJSON, ensure_ascii=False))
-	# else:
-	# 	print range
+	if range == "all":
+		clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered.json'), 'rb').read()
+		print clusters
+		clusterJSON = json.loads(clusters)
+		print clusterJSON[1]
+		return HttpResponse(json.dumps(clusterJSON, ensure_ascii=False))
+	else:
+		rangeArray = range.split("|")
+		start = rangeArray[0]
+		end = rangeArray[1]
+		print start
+		print end
+		tweets = Tweet.objects.exclude(hashtags="[]")
+		filteredTweets = []
+		hashtagCountMap = {}
+		for tweet in tweets:
+			time = tweet.javascriptTime()
+			print "Tweet time: " + time 
+			if (compareTo(start, time) <= 0) and (compareTo(time, end) <= 0):
+				filteredTweets.append(tweet.dictize())
+				hashtags = json.loads(tweet.hashtags)
+				for usedHashtag in hashtags:
+					if usedHashtag in hashtagCountMap:
+						hashtagCountMap[usedHashtag] += 1
+					else:
+						hashtagCountMap[usedHashtag] = 1
+		print len(filteredTweets)
+		sortedMap = sorted(hashtagCountMap.iteritems(), key=operator.itemgetter(1), reverse=True)
+		print sortedMap
+		commonHashtags = []
+		hashtagMap = {}
+		for hashtag in sortedMap[:10]:
+			commonHashtags.append(hashtags[0])
+			hashtagMap[hashtags[0]] = []
+		tweets = filteredTweets
+		for tweet in tweets:
+			print tweet
+			hashtags = tweet["hashtags"]
+			for usedHashtag in hashtags:
+				if usedHashtag in commonHashtags:
+					hashtagMap[usedHashtag].append(tweet)
+		print hashtagMap
+		for hashtag in commonHashtags:
+			print hashtagMap[hashtag]
+		clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered2.json'), 'rb').read()
+		clusterJSON = json.loads(clusters)
+		return HttpResponse(json.dumps(clusterJSON, ensure_ascii=False))
+
 
 def startTime():
 	return "Tue Oct 22 13:52:24 +0000 2013"
-
+# "Wed Oct 23 2013 07:28:38 GMT+0800 (SGT)"
 def endTime():
 	return "Wed Oct 23 21:53:13 +0000 2013"
 
 def compareTo(time1, time2):
-	formattedTime1 = time1[time1.find(" "):]
-	formattedTime2 = time2[time2.find(" "):]
+	time1array = time1.split()
+	time2array = time2.split()
+	formattedTime1 = time1array[1] + " " + time1array[2] + " " + time1array[3] + " " + time1array[4]
+	formattedTime2 = time2array[1] + " " + time2array[2] + " " + time2array[3] + " " + time2array[4]
+	print formattedTime1 + " " + formattedTime2
+	print cmp(formattedTime1, formattedTime2)
 	return cmp(formattedTime1, formattedTime2)

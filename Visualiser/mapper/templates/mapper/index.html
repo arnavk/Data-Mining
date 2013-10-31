@@ -41,7 +41,9 @@
               "$1 $2 $4 $3 UTC"));
         return date;
       }
-
+      function convertDateToUTC(date) {
+        return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); 
+      }
       function timeForPercentage (percentage)
       {
         return new Date (absoluteMinTime.getTime() + (percentage * absoluteRange * 0.01));
@@ -77,6 +79,27 @@
     <div id="map-canvas"></div>
     <div class="panel">
       <div class="container">
+        <div class="row">
+          <br>
+        </div>
+        <div class="row">  
+          <div class="col-md-2">
+          </div>
+          <div class="col-md-8">
+              <div class="layout-slider col-md-12">
+                <input id="Slider5" type="slider" name="area" class="" value="0;100" />
+              </div>
+              <script type="text/javascript" charset="utf-8">
+                jQuery("#Slider5").slider({ from: 0, to: 100, step: 1, dimension: '', limits: false, skin: "round_plastic", calculate: function( value ){
+                    return timeForPercentage (value);
+                  }, callback: function(value){
+                    console.log(value);
+                    var array = value.split(';');
+                    plotTrends(array[0], array[1]);
+                }});
+              </script>              
+          </div><!-- /.col-lg-8 -->
+        </div><!-- /.row -->
         <form id="searchForm" name="searchForm" method="post" onsubmit="return search();" role="form">
           {% csrf_token %}
           <br>
@@ -93,7 +116,7 @@
                   </button>
                 </span>
               </div><!-- /input-group -->
-            </div><!-- /.col-lg-6 -->
+            </div><!-- /.col-lg-8 -->
           </div><!-- /.row -->
         </form>
         <br>
@@ -103,25 +126,11 @@
           <div class="col-md-2">
           </div>
           <div class="col-md-8">
-            <!-- <form> -->
               <input class="col-md-12" id = "timeslider" name = "timeslider"  type="range" min="0" max="100" onchange="updateMap(this.value);">
               <output for="timeslider" id="rangevalue"></output>
               <!-- <div id="slider-range"></div> -->
-              <div class="layout-slider col-md-12">
-                <input id="Slider5" type="slider" name="area" class="" value="0;100" />
-              </div>
-              <script type="text/javascript" charset="utf-8">
-                    jQuery("#Slider5").slider({ from: 0, to: 100, step: 15, dimension: '', limits: false, skin: "round_plastic", calculate: function( value ){
-                        return timeForPercentage (value);
-                      }, callback: function(value){
-                        console.log(value);
-                        var array = value.split(';');
-                        plotTrends(array[0], array[1]);
-                    }});
-                
-              </script>
-            <!-- </form> -->
-          </div><!-- /.col-lg-6 -->
+              
+          </div><!-- /.col-lg-8 -->
         </div><!-- /.row -->
         <br>
         
