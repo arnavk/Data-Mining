@@ -123,3 +123,18 @@ def compareTo(time1, time2):
 	#print formattedTime1 + " " + formattedTime2
 	#print cmp(formattedTime1, formattedTime2)
 	return cmp(formattedTime1, formattedTime2)
+
+def clusterForTag(tweets):
+	dbscan = DBSCAN()
+	dbscanList = []
+	for tweet in tweets:
+		tweet2 = tweet.dictize()
+		coord = tweet2['coord']
+		p = Point(coord[0], coord[1])
+		dbscanList.append(p)
+	clusterSet = []
+	dbscan.DB = dbscanList
+	clusterSet = dbscan.DBSCAN()
+	
+	for cluster in clusterSet:
+		print "Centroid:", cluster['centroid'], ", Size: ", cluster['size']
