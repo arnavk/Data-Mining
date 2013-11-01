@@ -77,7 +77,7 @@ def clusters (request, range):
 		hashtagCountMap = {}
 		for tweet in tweets:
 			time = tweet.javascriptTime()
-			print "Tweet time: " + time 
+			#print "Tweet time: " + time 
 			if (compareTo(start, time) <= 0) and (compareTo(time, end) <= 0):
 				filteredTweets.append(tweet.dictize())
 				hashtags = json.loads(tweet.hashtags)
@@ -86,9 +86,9 @@ def clusters (request, range):
 						hashtagCountMap[usedHashtag] += 1
 					else:
 						hashtagCountMap[usedHashtag] = 1
-		print len(filteredTweets)
+		#print len(filteredTweets)
 		sortedMap = sorted(hashtagCountMap.iteritems(), key=operator.itemgetter(1), reverse=True)
-		print sortedMap
+		#print sortedMap
 		commonHashtags = []
 		hashtagMap = {}
 		for hashtag in sortedMap[:10]:
@@ -96,14 +96,14 @@ def clusters (request, range):
 			hashtagMap[hashtags[0]] = []
 		tweets = filteredTweets
 		for tweet in tweets:
-			print tweet
+			#print tweet
 			hashtags = tweet["hashtags"]
 			for usedHashtag in hashtags:
 				if usedHashtag in commonHashtags:
 					hashtagMap[usedHashtag].append(tweet)
-		print hashtagMap
-		for hashtag in commonHashtags:
-			print hashtagMap[hashtag]
+		#print hashtagMap
+		#for hashtag in commonHashtags:
+			#print hashtagMap[hashtag]
 		clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered2.json'), 'rb').read()
 		clusterJSON = json.loads(clusters)
 		return HttpResponse(json.dumps(clusterJSON, ensure_ascii=False))
@@ -120,6 +120,6 @@ def compareTo(time1, time2):
 	time2array = time2.split()
 	formattedTime1 = time1array[1] + " " + time1array[2] + " " + time1array[3] + " " + time1array[4]
 	formattedTime2 = time2array[1] + " " + time2array[2] + " " + time2array[3] + " " + time2array[4]
-	print formattedTime1 + " " + formattedTime2
-	print cmp(formattedTime1, formattedTime2)
+	#print formattedTime1 + " " + formattedTime2
+	#print cmp(formattedTime1, formattedTime2)
 	return cmp(formattedTime1, formattedTime2)
