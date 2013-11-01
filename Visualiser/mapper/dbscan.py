@@ -13,7 +13,7 @@ class DBSCAN:
       
 	def DBSCAN(self):
 		noise = 0
-		print len(self.DB)
+		# print len(self.DB)
 		for i in range(len(self.DB)):  
 			p_tmp = self.DB[i]  
 			if (not p_tmp.visited):  
@@ -30,8 +30,8 @@ class DBSCAN:
 					self.expandCluster(p_tmp, NeighborPts)
 
 		retCluster = []
-		print "Noise points", noise
-		print "Clusters found", len(self.cluster)
+		# print "Noise points", noise
+		# print "Clusters found", len(self.cluster)
 		for i in range(len(self.cluster)):
 			cluster = self.cluster[i]
 			x = 0
@@ -132,10 +132,10 @@ if __name__=='__main__':
 	#Do clustering
 	dbScan.DBSCAN()
   #Show result cluster
-	for i in range(len(dbScan.cluster)):
-		print 'Cluster: ', i
-	for j in range(len(dbScan.cluster[i])):
-		print dbScan.cluster[i][j].show()
+	# for i in range(len(dbScan.cluster)):
+	# 	 print 'Cluster: ', i
+	# for j in range(len(dbScan.cluster[i])):
+	# 	print dbScan.cluster[i][j].show()
 	  
 class Cluster:
 	def __init__(self, lat = 0, long = 0, size = 0):

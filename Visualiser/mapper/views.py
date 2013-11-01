@@ -4,6 +4,7 @@ from django.template import RequestContext, loader
 from django.conf import settings
 from mapper.models import *
 import os, json, operator
+from dbscan import *
 
 def index(request):
 	template = loader.get_template('mapper/index.html')
@@ -88,12 +89,14 @@ def clusters (request, range):
 						hashtagCountMap[usedHashtag] = 1
 		#print len(filteredTweets)
 		sortedMap = sorted(hashtagCountMap.iteritems(), key=operator.itemgetter(1), reverse=True)
-		#print sortedMap
+		# print "printing sortedMap"
+		# print sortedMap
 		commonHashtags = []
 		hashtagMap = {}
 		for hashtag in sortedMap[:10]:
-			commonHashtags.append(hashtags[0])
-			hashtagMap[hashtags[0]] = []
+			commonHashtags.append(hashtag[0])
+			hashtagMap[hashtag[0]] = []
+			print hashtag[0]
 		tweets = filteredTweets
 		for tweet in tweets:
 			#print tweet
@@ -101,12 +104,17 @@ def clusters (request, range):
 			for usedHashtag in hashtags:
 				if usedHashtag in commonHashtags:
 					hashtagMap[usedHashtag].append(tweet)
-		#print hashtagMap
-		#for hashtag in commonHashtags:
-			#print hashtagMap[hashtag]
-		clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered2.json'), 'rb').read()
-		clusterJSON = json.loads(clusters)
-		return HttpResponse(json.dumps(clusterJSON, ensure_ascii=False))
+		print commonHashtags
+		clusters = []
+		for hashtag in commonHashtags: 
+			clustersForTag = clusterForTag(hashtagMap[hashtag])
+			for cluster in clustersForTag:
+				cluster["hashtag"] = hashtag
+				clusters.append(cluster)
+				print cluster
+		#clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered2.json'), 'rb').read()
+		# clusterJSON = clusters
+		return HttpResponse(json.dumps(clusters, ensure_ascii=False))
 
 
 def startTime():
@@ -128,8 +136,7 @@ def clusterForTag(tweets):
 	dbscan = DBSCAN()
 	dbscanList = []
 	for tweet in tweets:
-		tweet2 = tweet.dictize()
-		coord = tweet2['coord']
+		coord = tweet['coord']
 		p = Point(coord[0], coord[1])
 		dbscanList.append(p)
 	clusterSet = []
@@ -138,3 +145,4 @@ def clusterForTag(tweets):
 	
 	for cluster in clusterSet:
 		print "Centroid:", cluster['centroid'], ", Size: ", cluster['size']
+	return clusterSet

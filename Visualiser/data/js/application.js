@@ -236,7 +236,7 @@ function updateClusters(new_clusters)
     clusterLabels.push(new MapLabel({
       text: cluster['hashtag'],
       fontFamily : '"Trebuchet MS", Helvetica, sans-serif',
-      position: new google.maps.LatLng(cluster['coord'][0], cluster["coord"][1]),
+      position: new google.maps.LatLng(cluster['centroid'][0], cluster['centroid'][1]),
       map: map,
       fontSize: 35,
       align: 'right'
