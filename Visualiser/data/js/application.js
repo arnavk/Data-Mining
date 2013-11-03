@@ -19,9 +19,18 @@ function stripToLatLong (lltTweet)
     return new google.maps.LatLng(90, 90);
   }
 }
-
+function removePlottedTweets()
+{
+  if(heatmap)
+  { 
+    heatmap.setMap(null);
+    document.getElementById("timeslider").style.visibility="hidden";
+  }
+}
 function plot(tweets)
 {
+  removeCurrentClusters();
+  removePlottedTweets();
   var points = new Array();
   console.log(tweets.length);
   for (var i = 0; i <tweets.length; i++)
@@ -29,7 +38,7 @@ function plot(tweets)
     points.push(stripToLatLong(stripToLatLongTime(tweets[i])));
   }
   var pointArray = new google.maps.MVCArray(points);  
-  if(heatmap) heatmap.setMap(null);
+  removePlottedTweets
 
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: pointArray
@@ -177,7 +186,7 @@ function plotTrends(startPercentage, endPercentage)
   console.log(convertDateToUTC(startTime).toString());
   console.log(convertDateToUTC(endTime).toString());
 
-  console.log("Came here");
+  removePlottedTweets();
   queryURL = "/clusters/" + convertDateToUTC(startTime).toString() + "|" + convertDateToUTC(endTime).toString() + "/";
   $.ajax({
     type:"GET",
@@ -227,6 +236,7 @@ function removeCurrentClusters ()
 function updateClusters(new_clusters)
 {
   removeCurrentClusters();
+  removePlottedTweets();
   clusters = new_clusters;
   clusterLabels = new Array();
   for (var i = 0; i < clusters.length; i++)
@@ -238,7 +248,7 @@ function updateClusters(new_clusters)
       fontFamily : '"Trebuchet MS", Helvetica, sans-serif',
       position: new google.maps.LatLng(cluster['centroid'][0], cluster['centroid'][1]),
       map: map,
-      fontSize: 35,
+      fontSize: (20+5*(i)),
       align: 'right'
     }));
   }

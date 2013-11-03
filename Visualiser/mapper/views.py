@@ -26,7 +26,7 @@ def search(request):
 	return index
 
 def tagsearch(request, hashtag):
-	print hashtag
+	print 'Searching for "' + hashtag + '".'
 	# data = open(os.path.join(settings.STATIC_ROOT, 'smaller_clean.json'), 'rb').read()
 	tweets = Tweet.objects.exclude(hashtags="[]")
 	filteredTweets = []
@@ -62,7 +62,7 @@ def initialize(request):
 
 def clusters (request, range):
 	if range == "all":
-		clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered.json'), 'rb').read()
+		clusters = open(os.path.join(settings.STATIC_ROOT, 'kmeans.json'), 'rb').read()
 		print clusters
 		clusterJSON = json.loads(clusters)
 		print clusterJSON[1]
@@ -83,12 +83,12 @@ def clusters (request, range):
 				filteredTweets.append(tweet.dictize())
 				hashtags = json.loads(tweet.hashtags)
 				for usedHashtag in hashtags:
-					if usedHashtag in hashtagCountMap:
-						hashtagCountMap[usedHashtag] += 1
+					if usedHashtag.lower() in hashtagCountMap:
+						hashtagCountMap[usedHashtag.lower()] += 1
 					else:
-						hashtagCountMap[usedHashtag] = 1
+						hashtagCountMap[usedHashtag.lower()] = 1
 		#print len(filteredTweets)
-		sortedMap = sorted(hashtagCountMap.iteritems(), key=operator.itemgetter(1), reverse=True)
+		sortedMap = sorted(hashtagCountMap.iteritems(), key = operator.itemgetter(1), reverse = True)
 		# print "printing sortedMap"
 		# print sortedMap
 		commonHashtags = []
@@ -112,9 +112,10 @@ def clusters (request, range):
 				cluster["hashtag"] = hashtag
 				clusters.append(cluster)
 				print cluster
+		sortedClusters = sorted(clusters, key = operator.itemgetter('size'), reverse = True) 
 		#clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered2.json'), 'rb').read()
 		# clusterJSON = clusters
-		return HttpResponse(json.dumps(clusters, ensure_ascii=False))
+		return HttpResponse(json.dumps(clusters[:10], ensure_ascii = False))
 
 
 def startTime():

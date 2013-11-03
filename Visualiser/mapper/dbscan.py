@@ -13,7 +13,7 @@ class DBSCAN:
       
 	def DBSCAN(self):
 		noise = 0
-		# print len(self.DB)
+		print len(self.DB)
 		for i in range(len(self.DB)):  
 			p_tmp = self.DB[i]  
 			if (not p_tmp.visited):  
