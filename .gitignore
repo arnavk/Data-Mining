@@ -6,3 +6,5 @@
 Visualiser/data/*.json
 
 Visualiser/static/*.json
+
+*.pyc
