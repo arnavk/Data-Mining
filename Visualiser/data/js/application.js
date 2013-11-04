@@ -1,17 +1,17 @@
 function stripToLatLongTime (tweet)
 {
-	//console.log (tweet);
-	var stripped = {
-		lat : tweet.coord[0],
-		lon : tweet.coord[1],
-		time : createdAtToDate (tweet.created_at),
-	};
-	return stripped;
+  //console.log (tweet);
+  var stripped = {
+    lat : tweet.coord[0],
+    lon : tweet.coord[1],
+    time : createdAtToDate (tweet.created_at),
+  };
+  return stripped;
 }
 
 function stripToLatLong (lltTweet)
 {
-	var point = new google.maps.LatLng(lltTweet.lat, lltTweet.lon);
+  var point = new google.maps.LatLng(lltTweet.lat, lltTweet.lon);
   if (point) return point;
   else
   {
@@ -136,7 +136,7 @@ function search()
       type:"GET",
       url :queryURL,
       datatype:"json",
-      error:function(data){enableButton();alert('Error:');},
+      error:function(data){enableButton();alert('The operation timed out. Please refresh the page and try again. Sorry, but we have limited memory resources.');},
       success:function(data){
         enableButton();
         tweets = JSON.parse(data);
@@ -192,7 +192,7 @@ function plotTrends(startPercentage, endPercentage)
     type:"GET",
     url :queryURL,
     datatype:"json",
-    error:function(data){alert('Error:');},
+    error:function(data){alert('The operation timed out. Please refresh the page and try again. Sorry, but we have limited memory resources.');},
     success:function(data){
       console.log("Got data!");
       var new_clusters = JSON.parse(data);

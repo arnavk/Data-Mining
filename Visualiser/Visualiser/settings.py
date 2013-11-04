@@ -20,6 +20,13 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default.
     }
 }
+# SITE_ID=u'52769f1c62b2ec154eb797fe'
+# DATABASES = {
+#    'default' : {
+#       'ENGINE' : 'django_mongodb_engine',
+#       'NAME' : 'visualizer_db'
+#    }
+# }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -119,15 +126,17 @@ TEMPLATE_DIRS = (
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
+    # 'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
+    # 'django.contrib.sessions',
+    # 'django.contrib.sites',
+    # 'django.contrib.messages',
     'django.contrib.staticfiles',
     'mapper',
     # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
+    # 'django.contrib.admin',
+    'django_mongodb_engine',
+    'djangotoolbox',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

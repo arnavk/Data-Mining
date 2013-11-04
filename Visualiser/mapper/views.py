@@ -37,32 +37,56 @@ def tagsearch(request, hashtag):
 				filteredTweets.append(tweet.dictize())
 	return HttpResponse(json.dumps(filteredTweets, ensure_ascii=False))
 
-def initialize(request):
+# def initialize(request):
+# 	r = open(os.path.join(settings.STATIC_ROOT, 'final_data.json'), 'r')
+# 	count = 0
+# 	for line in r:
+# 		tweetObj = json.loads(line)
+# 		created_at = tweetObj["created_at"]
+# 		id_str = tweetObj["id_str"]
+# 		text = tweetObj["text"]
+# 		user_handle = tweetObj["user_handle"]
+# 		user_id = tweetObj["user_id"]
+# 		hashtags = json.dumps(tweetObj["hashtags"], ensure_ascii=False)
+# 		coord = json.dumps(tweetObj["coord"], ensure_ascii=False)
+# 		country_code = tweetObj["country_code"]
+# 		country = tweetObj["country"]
+# 		lang = tweetObj["lang"]
+# 		tweet = Tweet(created_at = created_at, id_str = id_str, text=text, user_id=user_id, user_handle=user_handle,  hashtags=hashtags, coord = coord, country_code = country_code, lang=lang)
+# 		tweet.save()
+# 		count+=1
+# 		if count == 10000:
+# 			print Tweet.objects.count()
+# 			count = 0
+# 	return index
+
+def init():
 	r = open(os.path.join(settings.STATIC_ROOT, 'final_data.json'), 'r')
 	count = 0
 	for line in r:
 		tweetObj = json.loads(line)
 		created_at = tweetObj["created_at"]
-		id_str = tweetObj["id_str"]
-		text = tweetObj["text"]
-		user_handle = tweetObj["user_handle"]
-		user_id = tweetObj["user_id"]
+		# id_str = tweetObj["id_str"]
+		# text = tweetObj["text"]
+		# user_handle = tweetObj["user_handle"]
+		# user_id = tweetObj["user_id"]
 		hashtags = json.dumps(tweetObj["hashtags"], ensure_ascii=False)
 		coord = json.dumps(tweetObj["coord"], ensure_ascii=False)
-		country_code = tweetObj["country_code"]
-		country = tweetObj["country"]
-		lang = tweetObj["lang"]
-		tweet = Tweet(created_at = created_at, id_str = id_str, text=text, user_id=user_id, user_handle=user_handle,  hashtags=hashtags, coord = coord, country_code = country_code, lang=lang)
+		# country_code = tweetObj["country_code"]
+		# country = tweetObj["country"]
+		# lang = tweetObj["lang"]
+		# tweet = Tweet(created_at = created_at, id_str = id_str, text=text, user_id=user_id, user_handle=user_handle,  hashtags=hashtags, coord = coord, country_code = country_code, lang=lang)
+		tweet = Tweet(created_at = created_at, hashtags=hashtags, coord = coord)
 		tweet.save()
 		count+=1
 		if count == 10000:
 			print Tweet.objects.count()
 			count = 0
-	return index
+	return 'hello'
 
 def clusters (request, range):
 	if range == "all":
-		clusters = open(os.path.join(settings.STATIC_ROOT, 'kmeans.json'), 'rb').read()
+		clusters = open(os.path.join(settings.STATIC_ROOT, 'clustered.json'), 'rb').read()
 		print clusters
 		clusterJSON = json.loads(clusters)
 		print clusterJSON[1]
@@ -91,6 +115,7 @@ def clusters (request, range):
 		sortedMap = sorted(hashtagCountMap.iteritems(), key = operator.itemgetter(1), reverse = True)
 		# print "printing sortedMap"
 		# print sortedMap
+		print sortedMap[:10]
 		commonHashtags = []
 		hashtagMap = {}
 		for hashtag in sortedMap[:10]:
