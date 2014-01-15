@@ -4,11 +4,11 @@ Data-Mining
 CSC 489 - Data Analytics and Mining
 Submitted by Group 33
 
-Lee Mei Ying
-Keerthana Kumar
-Jain Manik
-Gayathri Gopalakrishnan
-Arnav Kumar
+- Lee Mei Ying
+- Keerthana Kumar
+- Jain Manik
+- Gayathri Gopalakrishnan
+- Arnav Kumar
 
 
 Instructions for local deployment:
