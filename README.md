@@ -35,8 +35,11 @@ Obtaining and deploying from GitHub.com
 5. Locally deploy the application from the command line using the "python manage.py runserver" command
 6. To access the application, go to a web browser (Firefox, Google Chrome and Safari are recommended) and go to "127.0.0.1:8000"
 
-
 =====================================================================================
 A version of the project is also deployed online at http://twitter-visualizer.herokuapp.com
 
 It is a free heroku deployment and has limited memory resources and some operations may time out. For best results use the local deployment. If you encounter too many time-outs on the web application, please contact one of the group members. They will temporarily increase the memory capacity of the remote server.
+
+=====================================================================================
+Credits: 
+- [badhessian.org: Collecting real-time Twitter data with the Streaming API](http://badhessian.org/2012/10/collecting-real-time-twitter-data-with-the-streaming-api/)
